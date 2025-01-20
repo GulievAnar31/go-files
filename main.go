@@ -31,9 +31,9 @@ MenuLoop: // Метка цикла
 			createAccount()
 		case "2":
 			fileName := ""
-			fmt.Println("Введите название файла:")
+			fmt.Println("Введите имя аккаунта:")
 			fmt.Scan(&fileName)
-			files.ReadFile(fileName)
+			findAccount(fileName)
 		case "3":
 			fieldName := ""
 			fmt.Println("Введите название файла:")
@@ -47,6 +47,25 @@ MenuLoop: // Метка цикла
 			continue MenuLoop
 		}
 	}
+}
+
+func findAccount(name string) {
+	_, err := files.ReadFile("data.json")
+
+	if err != nil {
+		color.Red("Не удалось считать файл data.json")
+	}
+
+	vault := account.NewVault()
+
+	for _, value := range vault.Accounts {
+		if value.Login == name {
+			fmt.Println(value)
+			return
+		}
+	}
+
+	color.Red("Такого аккаунта нет")
 }
 
 func createAccount() {
@@ -63,14 +82,11 @@ func createAccount() {
 
 	vault := account.NewVault()
 	vault.AddAccount(*account1)
-	// data, err := vault.ToBytes()
 
 	if err != nil {
 		color.Red("С созданием файла что то не так!")
 		return
 	}
-
-	// files.WriteFile(data, account1.Login+".json")
 
 	account1.OutputPassword()
 }
