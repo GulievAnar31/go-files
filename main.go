@@ -36,9 +36,9 @@ MenuLoop: // Метка цикла
 			findAccount(fileName)
 		case "3":
 			fieldName := ""
-			fmt.Println("Введите название файла:")
+			fmt.Println("Введите имя пользователя:")
 			fmt.Scan(&fieldName)
-			files.DeleteFile(fieldName)
+			deleteAccount(fieldName)
 		case "4":
 			fmt.Println("Выход из программы.")
 			break MenuLoop
@@ -66,6 +66,28 @@ func findAccount(name string) {
 	}
 
 	color.Red("Такого аккаунта нет")
+}
+
+func deleteAccount(name string) {
+	vault := account.NewVault()
+
+	newAccounts := []account.Account{}
+
+	for _, value := range vault.Accounts {
+		if value.Login == name {
+			continue
+		}
+		newAccounts = append(newAccounts, value)
+	}
+
+	vault.Accounts = newAccounts
+	newData, err := vault.ToBytes()
+
+	if err != nil {
+		color.Red("Не удалось преобразовать в байты")
+	}
+
+	files.WriteFile(newData, "data.json")
 }
 
 func createAccount() {
