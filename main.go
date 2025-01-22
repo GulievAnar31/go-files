@@ -57,7 +57,9 @@ func findAccount(name string) {
 		color.Red("Не удалось считать файл data.json")
 	}
 
-	vault := account.NewVault()
+	vault := account.NewVault(files.NewJsonDb("data.json"))
+	// vault := account.NewVault(cloud.NewCloudDb("data.json"))
+	// пример того как можно использовать di и заменять что то одно другим
 
 	for _, value := range vault.Accounts {
 		if value.Login == name {
@@ -71,7 +73,7 @@ func findAccount(name string) {
 
 func deleteAccount(name string) {
 	jsonDb := files.NewJsonDb("data.json")
-	vault := account.NewVault()
+	vault := account.NewVault(files.NewJsonDb("data.json"))
 
 	newAccounts := []account.Account{}
 
@@ -104,7 +106,7 @@ func createAccount() {
 		return
 	}
 
-	vault := account.NewVault()
+	vault := account.NewVault(files.NewJsonDb("data.json"))
 	vault.AddAccount(*account1)
 
 	if err != nil {

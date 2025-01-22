@@ -1,64 +1,61 @@
 package account
 
 import (
-	"demo/password/files"
 	"encoding/json"
 	"time"
 
 	"github.com/fatih/color"
 )
 
-type Vault struct {
-	Accounts  []Account `json: "accounts"`
-	UpdatedAt time.Time `json: "updatedAt"`
+type Db interface {
+	ReadFile() ([]byte, error)
+	WriteFile(content []byte) error
 }
 
-func NewVault() *Vault {
-	jsonDb := files.NewJsonDb("data.json")
-	file, err := jsonDb.ReadFile()
+type Vault struct {
+	Accounts  []Account `json:"accounts"`
+	UpdatedAt time.Time `json:"updatedAt"`
+	db        Db
+}
 
+func NewVault(db Db) *Vault {
+	file, err := db.ReadFile()
 	if err != nil {
+		color.Yellow("Ошибка чтения базы данных: %v", err)
 		return &Vault{
 			Accounts:  []Account{},
 			UpdatedAt: time.Now(),
+			db:        db,
 		}
 	}
 
 	var vault Vault
 	err = json.Unmarshal(file, &vault)
-
 	if err != nil {
-		color.Red(err.Error())
-		color.Red("Не удалось прочитать data.json")
-
+		color.Red("Ошибка парсинга базы данных: %v", err)
 		return &Vault{
 			Accounts:  []Account{},
 			UpdatedAt: time.Now(),
+			db:        db,
 		}
 	}
+
+	vault.db = db
 	return &vault
 }
 
-func (vault *Vault) AddAccount(acc Account) {
-	jsonDb := files.NewJsonDb("data.json")
-	vault.Accounts = append(vault.Accounts, acc)
-	vault.UpdatedAt = time.Now()
-	data, err := vault.ToBytes()
-
+func (v *Vault) AddAccount(acc Account) error {
+	v.Accounts = append(v.Accounts, acc)
+	v.UpdatedAt = time.Now()
+	data, err := v.ToBytes()
 	if err != nil {
-		color.Red(err.Error())
-		color.Red("Не удалось преобразовать файл")
+		return err
 	}
-
-	jsonDb.WriteFile(data)
+	v.db.WriteFile(data)
+	color.Green("Файл записан!")
+	return nil
 }
 
-func (vault *Vault) ToBytes() ([]byte, error) {
-	data, err := json.Marshal(vault)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return data, nil
+func (v *Vault) ToBytes() ([]byte, error) {
+	return json.Marshal(v)
 }

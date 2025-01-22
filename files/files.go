@@ -37,7 +37,7 @@ func (db *JsonDb) DeleteFile() {
 	color.Green("Файл удален")
 }
 
-func (db *JsonDb) WriteFile(content []byte) {
+func (db *JsonDb) WriteFile(content []byte) error {
 	file, err := os.Create(db.fileName)
 	defer file.Close()
 
@@ -49,8 +49,9 @@ func (db *JsonDb) WriteFile(content []byte) {
 
 	if err != nil {
 		fmt.Println(err)
-		return
+		return err
 	}
 
 	color.Green("Запись успешна")
+	return nil
 }
