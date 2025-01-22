@@ -50,7 +50,8 @@ MenuLoop: // Метка цикла
 }
 
 func findAccount(name string) {
-	_, err := files.ReadFile("data.json")
+	jsonDb := files.NewJsonDb("data.json")
+	_, err := jsonDb.ReadFile()
 
 	if err != nil {
 		color.Red("Не удалось считать файл data.json")
@@ -69,6 +70,7 @@ func findAccount(name string) {
 }
 
 func deleteAccount(name string) {
+	jsonDb := files.NewJsonDb("data.json")
 	vault := account.NewVault()
 
 	newAccounts := []account.Account{}
@@ -87,7 +89,7 @@ func deleteAccount(name string) {
 		color.Red("Не удалось преобразовать в байты")
 	}
 
-	files.WriteFile(newData, "data.json")
+	jsonDb.WriteFile(newData)
 }
 
 func createAccount() {

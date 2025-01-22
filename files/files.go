@@ -7,8 +7,18 @@ import (
 	"github.com/fatih/color"
 )
 
-func ReadFile(name string) ([]byte, error) {
-	data, err := os.ReadFile(name)
+type JsonDb struct {
+	fileName string
+}
+
+func NewJsonDb(name string) *JsonDb {
+	return &JsonDb{
+		fileName: name,
+	}
+}
+
+func (db *JsonDb) ReadFile() ([]byte, error) {
+	data, err := os.ReadFile(db.fileName)
 	if err != nil {
 		color.Red("При чтении произошла ошибка")
 		return nil, err
@@ -17,8 +27,8 @@ func ReadFile(name string) ([]byte, error) {
 	return data, nil
 }
 
-func DeleteFile(name string) {
-	err := os.Remove(name)
+func (db *JsonDb) DeleteFile() {
+	err := os.Remove(db.fileName)
 
 	if err != nil {
 		color.Red("Произошла ошибка удаления")
@@ -27,8 +37,8 @@ func DeleteFile(name string) {
 	color.Green("Файл удален")
 }
 
-func WriteFile(content []byte, name string) {
-	file, err := os.Create(name)
+func (db *JsonDb) WriteFile(content []byte) {
+	file, err := os.Create(db.fileName)
 	defer file.Close()
 
 	if err != nil {
