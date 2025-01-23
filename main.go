@@ -4,9 +4,8 @@ import (
 	"demo/password/account"
 	"demo/password/errors"
 	"demo/password/files"
+	"demo/password/output"
 	"fmt"
-
-	"github.com/fatih/color"
 )
 
 func main() {
@@ -43,7 +42,7 @@ MenuLoop: // Метка цикла
 			fmt.Println("Выход из программы.")
 			break MenuLoop
 		default:
-			color.Red("Неверный выбор. Попробуйте снова.")
+			output.PrintError("Неверный выбор. Попробуйте снова.")
 			continue MenuLoop
 		}
 	}
@@ -54,7 +53,7 @@ func findAccount(name string) {
 	_, err := jsonDb.ReadFile()
 
 	if err != nil {
-		color.Red("Не удалось считать файл data.json")
+		output.PrintError("Не удалось считать файл data.json")
 	}
 
 	vault := account.NewVault(files.NewJsonDb("data.json"))
@@ -68,7 +67,7 @@ func findAccount(name string) {
 		}
 	}
 
-	color.Red("Такого аккаунта нет")
+	output.PrintError("Такого аккаунта нет")
 }
 
 func deleteAccount(name string) {
@@ -88,7 +87,7 @@ func deleteAccount(name string) {
 	newData, err := vault.ToBytes()
 
 	if err != nil {
-		color.Red("Не удалось преобразовать в байты")
+		output.PrintError("Не удалось преобразовать в байты")
 	}
 
 	jsonDb.WriteFile(newData)
@@ -110,7 +109,7 @@ func createAccount() {
 	vault.AddAccount(*account1)
 
 	if err != nil {
-		color.Red("С созданием файла что то не так!")
+		output.PrintError("С созданием файла что то не так!")
 		return
 	}
 
@@ -126,7 +125,7 @@ func promptData(prompt string) string {
 			break
 		}
 
-		color.Red("Поле не может быть пустым. Попробуйте снова.")
+		output.PrintError("Поле не может быть пустым. Попробуйте снова.")
 	}
 	return res
 }

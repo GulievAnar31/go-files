@@ -7,9 +7,17 @@ import (
 	"github.com/fatih/color"
 )
 
-type Db interface {
+type ByteReader interface {
 	ReadFile() ([]byte, error)
+}
+
+type ByteWriter interface {
 	WriteFile(content []byte) error
+}
+
+type Db interface {
+	ByteReader
+	ByteWriter
 }
 
 type Vault struct {
