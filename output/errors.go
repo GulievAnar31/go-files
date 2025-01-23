@@ -19,6 +19,6 @@ func PrintError(value any) {
 	}
 }
 
-func sum[T int | float64 | float32](a, b T) T { // так используются дженерики
+func sum[T int | float64 | float32](a, b T) T {  // так используются дженерики
 	return a + b
 }
