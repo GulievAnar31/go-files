@@ -4,14 +4,17 @@ import "github.com/fatih/color"
 
 // interface{} = any = any alias
 func PrintError(value any) {
-	switch t := value.(type) {
-	case string:
-		color.Red(t)
-		break
-	case int:
-		color.Red("Код ошибки %d", t)
-		break
-	default:
-		color.Red("Неизвестный код ошибки")
+	stringVal, ok := value.(string) // вот так можно попробовать преобразовать в определенный тип
+	if ok {
+		color.Red(stringVal)
+	}
+	intVal, ok := value.(int)
+	if ok {
+		color.Red("Код ошибки %d", intVal)
+	}
+	errVal, ok := value.(error)
+	if ok {
+		color.Red(errVal.Error())
+		return
 	}
 }
