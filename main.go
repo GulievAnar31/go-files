@@ -13,18 +13,16 @@ func main() {
 }
 
 func getMenu() {
-	var variant string
-
+	variant := promptData([]string{
+		"Выберите действие: ",
+		"1. Создать аккаунт",
+		"2. Найти аккаунт",
+		"3. Удалить аккаунт",
+		"4. Выйти",
+	})
 MenuLoop: // Метка цикла
 	for {
-		fmt.Println("Выберите действие: ")
-		fmt.Println("1. Создать аккаунт")
-		fmt.Println("2. Найти аккаунт")
-		fmt.Println("3. Удалить аккаунт")
-		fmt.Println("4. Выйти")
-
-		fmt.Scan(&variant)
-
+		// fmt.Scan(&variant)
 		switch variant {
 		case "1":
 			createAccount()
@@ -94,9 +92,9 @@ func deleteAccount(name string) {
 }
 
 func createAccount() {
-	login := promptData("Введите логин: ")
-	password := promptData("Введите пароль: ")
-	url := promptData("Введите url: ")
+	login := promptData([]string{"Введите логин: "})
+	password := promptData([]string{"Введите пароль: "})
+	url := promptData([]string{"Введите url: "})
 
 	account1, err := account.NewAccount(login, password, url)
 
@@ -116,7 +114,14 @@ func createAccount() {
 	account1.OutputPassword()
 }
 
-func promptData(prompt string) string {
+func promptData[T any](prompt []T) string {
+	for i, val := range prompt {
+		if i == len(prompt)-1 {
+			fmt.Printf("%v: ", val)
+		} else {
+			fmt.Println(val)
+		}
+	}
 	var res string
 	for {
 		fmt.Println(prompt)
