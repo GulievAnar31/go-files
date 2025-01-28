@@ -20,24 +20,22 @@ func getMenu() {
 		"3. Удалить аккаунт",
 		"4. Выйти",
 	})
+
 MenuLoop: // Метка цикла
-	for {
+	for variant != "4" {
 		// fmt.Scan(&variant)
 		switch variant {
 		case "1":
 			createAccount()
 		case "2":
 			fileName := ""
-			fmt.Println("Введите имя аккаунта:")
 			fmt.Scan(&fileName)
 			findAccount(fileName)
 		case "3":
 			fieldName := ""
-			fmt.Println("Введите имя пользователя:")
 			fmt.Scan(&fieldName)
 			deleteAccount(fieldName)
 		case "4":
-			fmt.Println("Выход из программы.")
 			break MenuLoop
 		default:
 			output.PrintError("Неверный выбор. Попробуйте снова.")
@@ -112,6 +110,7 @@ func createAccount() {
 	}
 
 	account1.OutputPassword()
+	getMenu()
 }
 
 func promptData[T any](prompt []T) string {
@@ -122,9 +121,9 @@ func promptData[T any](prompt []T) string {
 			fmt.Println(val)
 		}
 	}
+	
 	var res string
 	for {
-		fmt.Println(prompt)
 		fmt.Scan(&res)
 		if res != "" {
 			break
