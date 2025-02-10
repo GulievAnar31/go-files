@@ -6,42 +6,11 @@ import (
 	"demo/password/files"
 	"demo/password/output"
 	"fmt"
+	"strings"
 )
 
 func main() {
 	getMenu()
-}
-
-func getMenu() {
-	variant := promptData([]string{
-		"Выберите действие: ",
-		"1. Создать аккаунт",
-		"2. Найти аккаунт",
-		"3. Удалить аккаунт",
-		"4. Выйти",
-	})
-
-MenuLoop: // Метка цикла
-	for variant != "4" {
-		// fmt.Scan(&variant)
-		switch variant {
-		case "1":
-			createAccount()
-		case "2":
-			fileName := ""
-			fmt.Scan(&fileName)
-			findAccount(fileName)
-		case "3":
-			fieldName := ""
-			fmt.Scan(&fieldName)
-			deleteAccount(fieldName)
-		case "4":
-			break MenuLoop
-		default:
-			output.PrintError("Неверный выбор. Попробуйте снова.")
-			continue MenuLoop
-		}
-	}
 }
 
 func findAccount(name string) {
@@ -64,6 +33,25 @@ func findAccount(name string) {
 	}
 
 	output.PrintError("Такого аккаунта нет")
+}
+
+func findAccountByUrl(url string) {
+	jsonDb := files.NewJsonDb("data.json")
+	_, err := jsonDb.ReadFile()
+
+	if err != nil {
+		output.PrintError("Не удалось считать файл data.json")
+	}
+
+	vault := account.NewVault(jsonDb)
+
+	for _, value := range vault.Accounts {
+		if strings.Contains(value.Url, url) {
+			fmt.Println(value)
+		}
+	}
+
+	output.PrintError("Это все аккаунт который нашлись")
 }
 
 func deleteAccount(name string) {
@@ -121,7 +109,7 @@ func promptData[T any](prompt []T) string {
 			fmt.Println(val)
 		}
 	}
-	
+
 	var res string
 	for {
 		fmt.Scan(&res)
@@ -132,4 +120,50 @@ func promptData[T any](prompt []T) string {
 		output.PrintError("Поле не может быть пустым. Попробуйте снова.")
 	}
 	return res
+}
+
+func getMenu() {
+	var menu = map[string]interface{}{
+		"1": createAccount,
+		"2": findAccount,
+		"3": findAccountByUrl,
+		"4": deleteAccount,
+	}
+
+	variant := promptData([]string{
+		"Выберите действие: ",
+		"1. Создать аккаунт",
+		"2. Найти аккаунт по логину",
+		"3. Найти аккаунт по URL",
+		"4. Удалить аккаунт",
+		"5. Выйти",
+	})
+
+	for variant != "5" {
+		if action, exists := menu[variant]; exists {
+			switch fn := action.(type) {
+			case func(): // Функция без аргументов
+				fn()
+			case func(string): // Функция с аргументом
+				var input string
+				fmt.Print("Введите значение: ")
+				fmt.Scan(&input)
+				fn(input)
+			default:
+				fmt.Println("Ошибка: неподдерживаемый тип функции")
+			}
+		} else {
+			fmt.Println("Неверный выбор. Попробуйте снова.")
+		}
+
+		// Запрос нового варианта после выполнения команды
+		variant = promptData([]string{
+			"Выберите действие: ",
+			"1. Создать аккаунт",
+			"2. Найти аккаунт по логину",
+			"3. Найти аккаунт по URL",
+			"4. Удалить аккаунт",
+			"5. Выйти",
+		})
+	}
 }
